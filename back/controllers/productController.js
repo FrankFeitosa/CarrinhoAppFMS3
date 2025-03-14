@@ -30,19 +30,21 @@ export const updateProduct = async (req, res) => {
     const { produto, preco } = req.body;
     try {
         const product = await prisma.product.findFirst({
-            where: { id: id }
+            where: { id: parseInt(id) }
         });
         if (!product) return res.status(404).json({ message: "Não encontrado." });
+
         const productAtualizado = await prisma.product.update({
-            where: { id },
+            where: { id: parseInt(id) },
             data: {
-                produto,
-                preco
+                name: produto ? produto : product.name,
+                price: preco ? parseFloat(preco) : product.price,
             }
         });
         res.status(200).json(productAtualizado);
     } catch (error) {
         res.status(500).json({ error: "Erro ao atualizar produto" });
+        console.log(error);
     }
 };
 
