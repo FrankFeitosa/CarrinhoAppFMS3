@@ -1,161 +1,276 @@
-/* Corpo e fundo da página */
-body {
-  font-family: 'Roboto', sans-serif;
+body, html {
   margin: 0;
   padding: 0;
-  background-color: #f4f4f9; /* Fundo neutro claro */
-  color: #333; /* Texto escuro */
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #f4f4f9;
+  overflow: hidden;
+}
+
+.expanded-container {
+  width: 100%;
+  max-width: 1200px;
+  height: calc(100vh - 40px);
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  text-align: center;
+  color: #4CAF50;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+form {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Altura da tela inteira */
-}
-
-/* Contêiner principal */
-.container {
-  width: 100%;
-  max-width: 700px;
-  padding: 30px;
-  background: #ffffff; /* Fundo branco */
-  border-radius: 12px; /* Bordas arredondadas */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra leve */
-  overflow: hidden; /* Impede elementos de ultrapassarem */
-}
-
-/* Cabeçalho */
-h1 {
-  text-align: center;
-  color: #4CAF50; /* Verde neutro e elegante */
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-  font-weight: bold;
-}
-
-/* Formulários */
-label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 5px;
-  display: block; /* Posiciona os labels acima dos inputs */
-}
-
-.form-item,
-.form-desconto {
-  display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 20px;
-  align-items: center; /* Centraliza os elementos */
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-input[type="text"],
-input[type="number"] {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #ffffff; /* Fundo branco para contraste */
-  color: #333; /* Texto escuro para boa legibilidade */
+select {
+  flex: 7;
+  padding: 12px;
+  color: black;
   font-size: 1rem;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus {
-  background-color: #e9ecef; /* Fundo cinza claro no foco */
-  border-color: #4CAF50; /* Verde no foco */
+select:focus {
+  border-color: #4CAF50;
   outline: none;
+  color: black;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
 }
 
-input[type="number"] {
-  max-width: 100px; /* Limita a largura dos campos numéricos */
-}
-
-/* Botões */
 button {
-  padding: 10px 20px;
+  flex: 3;
+  padding: 12px;
   font-size: 1rem;
-  background-color: #4CAF50; /* Verde elegante */
-  color: #fff;
-  border: none;
   border-radius: 8px;
+  border: none;
+  background-color: #4CAF50;
+  color: #fff;
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 button:hover {
-  background-color: #388E3C; /* Verde mais escuro no hover */
+  background-color: #388E3C;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Tabelas */
+.table-container {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+  border: 2px solid #f1f1f1;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  background-color: #f8f9fa; /* Fundo claro */
-  border-radius: 8px;
-  overflow: hidden; /* Evita que bordas da tabela escapem */
+  background-color: #fff;
 }
 
-th,
-td {
-  text-align: left;
-  padding: 12px;
+th, td {
+  text-align: center;
+  padding: 15px;
   border-bottom: 1px solid #ddd;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 th {
-  background-color: #4CAF50; /* Verde elegante para cabeçalho */
+  background-color: #4CAF50;
   color: #fff;
-  font-weight: bold;
-  text-transform: uppercase;
+  position: sticky;
+  top: 0;
 }
 
 td:nth-child(even) {
-  background-color: #f4f4f9; /* Linhas alternadas */
+  background-color: #f4f4f9;
 }
 
-/* Total do carrinho */
-.total {
-  text-align: right;
+td .quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+td .quantity-control button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 1rem;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background-color: #f4f4f9;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+td .quantity-control button:hover {
+  background-color: #4CAF50;
+  color: #fff;
+  border-color: #4CAF50;
+}
+
+td .quantity-control span {
   font-size: 1rem;
   font-weight: bold;
-  margin-top: 15px;
-  color: #333;
+  min-width: 30px;
+  text-align: center;
 }
 
-/* Responsividade */
+.total {
+  text-align: right;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
 @media (max-width: 768px) {
-  .container {
-    padding: 20px;
+  .expanded-container {
+    padding: 10px;
+    margin: 10px;
+    height: calc(100vh - 20px);
   }
 
   h1 {
     font-size: 1.5rem;
+    margin-bottom: 15px;
   }
 
-  .form-item,
-  .form-desconto {
+  form {
     flex-direction: column;
     gap: 10px;
+    width: 100%;
   }
 
-  input[type="text"],
-  input[type="number"] {
-    width: 100%; /* Inputs ocupam toda a largura em telas menores */
-  }
-
-  button {
-    width: 100%; /* Botões ocupam toda a largura */
-  }
-
-  th,
-  td {
-    font-size: 0.8rem;
+  select, button {
+    width: 100%;
+    font-size: 0.9rem;
     padding: 10px;
+  }
+
+  .table-container {
+    margin-top: 15px;
+  }
+
+  th, td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  td .quantity-control button {
+    width: 25px;
+    height: 25px;
+    font-size: 0.9rem;
+  }
+
+  td .quantity-control span {
+    font-size: 0.9rem;
+  }
+
+  .total {
+    font-size: 1.2rem;
+    margin-top: 15px;
   }
 }
 
+@media (max-width: 480px) {
+  .expanded-container {
+    padding: 5px;
+    margin: 5px;
+    height: calc(100vh - 10px);
+  }
+
+  h1 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+
+  select, button {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  th, td {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  td .quantity-control button {
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+
+  td .quantity-control span {
+    font-size: 0.8rem;
+  }
+
+  .total {
+    font-size: 1rem;
+    margin-top: 10px;
+  }
+}

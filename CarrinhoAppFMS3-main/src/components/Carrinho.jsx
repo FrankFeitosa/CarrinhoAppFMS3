@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { getCart, addItem, removeItem, updateQuantidade, getProducts } from "../api.js";
+import {
+  getCart,
+  addItem,
+  removeItem,
+  updateQuantidade,
+  getProducts,
+} from "../api.js";
 import "./styles.css";
 
 function Carrinho() {
@@ -9,23 +15,18 @@ function Carrinho() {
   const [quantidade, setQuantidade] = useState(1);
   const [carregando, setCarregando] = useState(true);
 
-  // Carregar o carrinho e produtos do backend
   useEffect(() => {
     const fetchData = async () => {
       setCarregando(true);
       const [cartData, productsData] = await Promise.all([
         getCart(),
-        getProducts()
+        getProducts(),
       ]);
 
       setCarrinho(cartData);
       setProdutos(productsData);
       setCarregando(false);
 
-      // Se temos produtos, selecione o primeiro por padrão
-      // if (productsData.length > 0 && productId === "def") {
-      //   setProductId(productsData[0].id.toString());
-      // }
     };
 
     setTimeout(fetchData, 2000);
@@ -35,21 +36,26 @@ function Carrinho() {
     e.preventDefault();
     if (productId === "def") return alert("Escolha um produto!");
 
-    // Verificar se o produto já existe no carrinho
-    const itemExistente = carrinho.find(item => item.productId.toString() === productId.toString());
+    const itemExistente = carrinho.find(
+      (item) => item.productId.toString() === productId.toString()
+    );
 
     if (itemExistente) {
-      // Se o produto já existe, apenas atualize a quantidade
       const novaQuantidade = itemExistente.quantity + quantidade;
-      const itemAtualizado = await updateQuantidade(itemExistente.id, novaQuantidade, productId);
+      const itemAtualizado = await updateQuantidade(
+        itemExistente.id,
+        novaQuantidade,
+        productId
+      );
 
       if (itemAtualizado) {
-        setCarrinho(carrinho.map(item =>
-          item.id === itemExistente.id ? itemAtualizado : item
-        ));
+        setCarrinho(
+          carrinho.map((item) =>
+            item.id === itemExistente.id ? itemAtualizado : item
+          )
+        );
       }
     } else {
-      // Se o produto não existe, adicione um novo item
       const itemAdicionado = await addItem({ productId, quantity: quantidade });
 
       if (itemAdicionado) {
@@ -68,15 +74,22 @@ function Carrinho() {
   const alterarQuantidade = async (id, novaQuantidade, productId) => {
     if (novaQuantidade < 1) return;
 
-    const itemAtualizado = await updateQuantidade(id, novaQuantidade, productId);
+    const itemAtualizado = await updateQuantidade(
+      id,
+      novaQuantidade,
+      productId
+    );
     if (itemAtualizado) {
-      setCarrinho(carrinho.map((item) => (item.id === id ? itemAtualizado : item)));
+      setCarrinho(
+        carrinho.map((item) => (item.id === id ? itemAtualizado : item))
+      );
     }
   };
 
-  // Função para obter o nome do produto pelo ID
   const getNomeProduto = (productId) => {
-    const produto = produtos.find(p => p.id.toString() === productId.toString());
+    const produto = produtos.find(
+      (p) => p.id.toString() === productId.toString()
+    );
     return produto ? produto.name : `Produto ${productId}`;
   };
 
@@ -93,7 +106,9 @@ function Carrinho() {
           onChange={(e) => setProductId(e.target.value)}
           required
         >
-          <option value="def" disabled>Selecione um produto</option>
+          <option value="def" disabled>
+            Selecione um produto
+          </option>
           {produtos.map((produto) => (
             <option key={produto.id} value={produto.id}>
               {produto.name}
@@ -102,36 +117,65 @@ function Carrinho() {
         </select>
         <button type="submit">Adicionar</button>
       </form>
-      <table>
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Quantidade</th>
-            <th>Preço</th>
-            <th>Subtotal</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {carrinho.map((item) => (
-            <tr key={item.id}>
-              <td>{getNomeProduto(item.productId)}</td>
-              <td>
-                <button onClick={() => alterarQuantidade(item.id, item.quantity - 1, item.productId)}>-</button>
-                {item.quantity}
-                <button onClick={() => alterarQuantidade(item.id, item.quantity + 1, item.productId)}>+</button>
-              </td>
-              <td>R$ {item.price.toFixed(2)}</td>
-              <td>R$ {(item.quantity * item.price).toFixed(2)}</td>
-              <td>
-                <button onClick={() => removerItemDoCarrinho(item.id)}>Remover</button>
-              </td>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Preço</th>
+              <th>Subtotal</th>
+              <th>Ações</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {carrinho.map((item) => (
+              <tr key={item.id}>
+                <td>{getNomeProduto(item.productId)}</td>
+                <td>
+                  <div className="quantity-control">
+                    <button
+                      onClick={() =>
+                        alterarQuantidade(
+                          item.id,
+                          item.quantity - 1,
+                          item.productId
+                        )
+                      }
+                    >
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() =>
+                        alterarQuantidade(
+                          item.id,
+                          item.quantity + 1,
+                          item.productId
+                        )
+                      }
+                    >
+                      +
+                    </button>
+                  </div>{" "}
+                </td>
+                <td>R$ {item.price.toFixed(2)}</td>
+                <td>R$ {(item.quantity * item.price).toFixed(2)}</td>
+                <td>
+                  <button onClick={() => removerItemDoCarrinho(item.id)}>
+                    Remover
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div className="total">
-        Total: R$ {carrinho.reduce((acc, item) => acc + item.quantity * item.price, 0).toFixed(2)}
+        Total: R${" "}
+        {carrinho
+          .reduce((acc, item) => acc + item.quantity * item.price, 0)
+          .toFixed(2)}
       </div>
     </div>
   );
