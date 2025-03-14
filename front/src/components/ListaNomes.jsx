@@ -43,7 +43,7 @@ const ListaNomes = ({ nomes, editarNome, excluirNome }) => {
                 >
                   ✏️
                 </button>
-                <button onClick={() => excluirNome(n.id)}>🗑️</button>
+                <button id="trash" onClick={() => excluirNome(n.id)}>🗑️</button>
               </>
             )}
           </li>
