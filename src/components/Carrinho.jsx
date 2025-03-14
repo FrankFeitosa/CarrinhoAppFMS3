@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getCart, addItem, removeItem, updateQuantidade, aplicarDesconto } from '../api.js';
 import './styles.css';
 
 function Carrinho() {
@@ -9,153 +10,107 @@ function Carrinho() {
   const [codigoDesconto, setCodigoDesconto] = useState('');
   const [total, setTotal] = useState(0);
 
-  const atualizarTotal = (novoCarrinho) => {
-    const novoTotal = novoCarrinho.reduce(
-      (acc, item) => acc + item.quantidade * item.preco,
-      0
-    );
+  // Carregar o carrinho do backend
+  useEffect(() => {
+    const fetchCarrinho = async () => {
+      const data = await getCart();
+      setCarrinho(data);
+      calcularTotal(data);
+    };
+    fetchCarrinho();
+  }, []);
+
+  const calcularTotal = (itens) => {
+    const novoTotal = itens.reduce((acc, item) => acc + item.quantidade * item.preco, 0);
     setTotal(novoTotal);
   };
 
-  const adicionarItem = (e) => {
+  const adicionarItem = async (e) => {
     e.preventDefault();
-
-    const itemExistente = carrinho.find((item) => item.nome === nomeItem);
-    let novoCarrinho;
-
-    if (itemExistente) {
-      novoCarrinho = carrinho.map((item) =>
-        item.nome === nomeItem
-          ? { ...item, quantidade: item.quantidade + quantidadeItem }
-          : item
-      );
-    } else {
-      novoCarrinho = [
-        ...carrinho,
-        { nome: nomeItem, quantidade: quantidadeItem, preco: precoItem },
-      ];
+    const novoItem = { nome: nomeItem, quantidade: quantidadeItem, preco: precoItem };
+    const itemAdicionado = await addItem(novoItem);
+    
+    if (itemAdicionado) {
+      setCarrinho([...carrinho, itemAdicionado]);
+      calcularTotal([...carrinho, itemAdicionado]);
     }
-
-    setCarrinho(novoCarrinho);
-    atualizarTotal(novoCarrinho);
+    
     setNomeItem('');
     setQuantidadeItem(1);
     setPrecoItem(0);
   };
 
-  const removerItem = (index) => {
-    const novoCarrinho = carrinho.filter((_, i) => i !== index);
+  const removerItemDoCarrinho = async (id) => {
+    await removeItem(id);
+    const novoCarrinho = carrinho.filter((item) => item.id !== id);
     setCarrinho(novoCarrinho);
-    atualizarTotal(novoCarrinho);
+    calcularTotal(novoCarrinho);
   };
 
-  const aumentarQuantidade = (index) => {
-    const novoCarrinho = carrinho.map((item, i) =>
-      i === index ? { ...item, quantidade: item.quantidade + 1 } : item
-    );
-    setCarrinho(novoCarrinho);
-    atualizarTotal(novoCarrinho);
+  const alterarQuantidade = async (id, novaQuantidade) => {
+    const itemAtualizado = await updateQuantidade(id, novaQuantidade);
+    if (itemAtualizado) {
+      const novoCarrinho = carrinho.map((item) => (item.id === id ? itemAtualizado : item));
+      setCarrinho(novoCarrinho);
+      calcularTotal(novoCarrinho);
+    }
   };
 
-  const diminuirQuantidade = (index) => {
-    const novoCarrinho = carrinho.map((item, i) =>
-      i === index && item.quantidade > 1
-        ? { ...item, quantidade: item.quantidade - 1 }
-        : item
-    );
-    setCarrinho(novoCarrinho);
-    atualizarTotal(novoCarrinho);
-  };
-
-  const aplicarDesconto = (e) => {
+  const aplicarCodigoDesconto = async (e) => {
     e.preventDefault();
-
-    let desconto = 0;
-    if (codigoDesconto === 'DESC10') {
-      desconto = 0.1;
-    } else if (codigoDesconto === 'DESC20') {
-      desconto = 0.2;
+    const descontoData = await aplicarDesconto(codigoDesconto);
+    
+    if (descontoData && descontoData.novoTotal) {
+      setTotal(descontoData.novoTotal);
+      alert(`Desconto aplicado! Novo total: R$ ${descontoData.novoTotal.toFixed(2)}`);
     } else {
       alert('Código de desconto inválido.');
-      return;
     }
 
-    const novoTotal = total * (1 - desconto);
-    setTotal(novoTotal);
-    alert(`Desconto de ${desconto * 100}% aplicado!`);
     setCodigoDesconto('');
   };
 
   return (
     <div className="expanded-container">
       <h1>Gerenciador de Carrinho</h1>
-      <div className="form-wrapper">
-        <form onSubmit={adicionarItem} className="form-item">
-          <label>Nome do Produto:</label>
-          <input
-            type="text"
-            value={nomeItem}
-            onChange={(e) => setNomeItem(e.target.value)}
-            placeholder="Nome do produto"
-            required
-          />
-          <label>Quantidade:</label>
-          <input
-            type="number"
-            value={quantidadeItem}
-            onChange={(e) => setQuantidadeItem(parseInt(e.target.value))}
-            required
-            min="1"
-          />
-          <label>Preço Unitário:</label>
-          <input
-            type="number"
-            value={precoItem}
-            onChange={(e) => setPrecoItem(parseFloat(e.target.value))}
-            required
-            min="0.01"
-            step="0.01"
-          />
-          <button type="submit">Adicionar</button>
-        </form>
-        <form onSubmit={aplicarDesconto} className="form-desconto">
-          <input
-            type="text"
-            value={codigoDesconto}
-            onChange={(e) => setCodigoDesconto(e.target.value)}
-            placeholder="Código de desconto"
-          />
-          <button type="submit">Aplicar Desconto</button>
-        </form>
-      </div>
-      <table className="expanded-table">
+      <form onSubmit={adicionarItem}>
+        <input type="text" value={nomeItem} onChange={(e) => setNomeItem(e.target.value)} required />
+        <input type="number" value={quantidadeItem} onChange={(e) => setQuantidadeItem(parseInt(e.target.value))} required min="1" />
+        <input type="number" value={precoItem} onChange={(e) => setPrecoItem(parseFloat(e.target.value))} required min="0.01" step="0.01" />
+        <button type="submit">Adicionar</button>
+      </form>
+      <table>
         <thead>
           <tr>
             <th>Produto</th>
             <th>Quantidade</th>
-            <th>Preço Unitário</th>
+            <th>Preço</th>
             <th>Subtotal</th>
-            <th>Ação</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          {carrinho.map((item, index) => (
-            <tr key={index}>
+          {carrinho.map((item) => (
+            <tr key={item.id}>
               <td>{item.nome}</td>
               <td>
-                <button onClick={() => diminuirQuantidade(index)}>-</button>
+                <button onClick={() => alterarQuantidade(item.id, item.quantidade - 1)}>-</button>
                 {item.quantidade}
-                <button onClick={() => aumentarQuantidade(index)}>+</button>
+                <button onClick={() => alterarQuantidade(item.id, item.quantidade + 1)}>+</button>
               </td>
               <td>R$ {item.preco.toFixed(2)}</td>
               <td>R$ {(item.quantidade * item.preco).toFixed(2)}</td>
               <td>
-                <button onClick={() => removerItem(index)}>Remover</button>
+                <button onClick={() => removerItemDoCarrinho(item.id)}>Remover</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <form onSubmit={aplicarCodigoDesconto}>
+        <input type="text" value={codigoDesconto} onChange={(e) => setCodigoDesconto(e.target.value)} placeholder="Código de desconto" />
+        <button type="submit">Aplicar Desconto</button>
+      </form>
       <div className="total">Total: R$ {total.toFixed(2)}</div>
     </div>
   );
