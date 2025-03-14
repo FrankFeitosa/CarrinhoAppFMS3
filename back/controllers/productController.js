@@ -52,11 +52,11 @@ export const deleteProduct = async (req, res) => {
     const { id } = req.params;
     try {
         const product = await prisma.product.findFirst({
-            where: { id: id }
+            where: { id: parseInt(id) }
         });
         if (!product) return res.status(404).json({ message: "Não encontrado." });
         await prisma.product.delete({
-            where: { id }
+            where: { id: parseInt(id) }
         });
         res.status(200).json({ message: "Produto deletado com sucesso." });
     } catch (error) {
